@@ -31,5 +31,30 @@ def filter(df,ip):
     return df
 
 
+@app.route('/missing', methods=['GET'])
+def missing_val():
+    df = pd.read_csv('data.csv')
+    percent_missing = df.isnull().sum() * 100 / len(df)
+    return percent_missing.to_dict()
+
+
+@app.route('/nul', methods=['GET'])
+def fill_null_val():
+    df = pd.read_csv('data.csv')
+    res=df.fillna("N/A")
+    result=res.to_json(orient="records")
+    parsed = json.loads(result)
+    return jsonify(parsed)
+
+@app.route('/gpa', methods=['GET'])
+def student_filer():
+    data = pd.read_csv('student.csv')
+    list_=['gpa_sem1', 'gpa_sem2', 'gpa_sem3', 'gpa_sem4', 'gpa_sem5', 'gpa_sem6', 'gpa_sem7', 'gpa_sem8']
+    data['max_gpa'] = data[list_].max(axis=1)
+    data['max_sem'] = data[['gpa_sem1', 'gpa_sem2', 'gpa_sem3', 'gpa_sem4', 'gpa_sem5', 'gpa_sem6', 'gpa_sem7', 'gpa_sem8']].idxmax(axis=1)
+    result=data.to_json(orient="records")
+    parsed=json.loads(result)
+    return jsonify(parsed)
+
 if __name__ == '__main__':
     app.run(debug=True)
